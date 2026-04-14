@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+
+            - id: account-service
+              uri: lb://account-service
+              predicates:
+                - Path=/api/accounts/**
+
+            - id: transaction-service
+              uri: lb://transaction-service
+              predicates:
+                - Path=/api/transactions/**
+
+            - id: budgetwise
+              uri: lb://budgetwise
+              predicates:
+                - Path=/api/budgets/**,/api/exchange/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
