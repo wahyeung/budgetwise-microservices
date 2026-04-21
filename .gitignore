@@ -34,3 +34,5 @@ build/
 
 # Credentials
 **/application-local.yml
+
+**/application-prod.yml
