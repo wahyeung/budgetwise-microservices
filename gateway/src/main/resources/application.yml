@@ -26,15 +26,15 @@ spring:
               predicates:
                 - Path=/api/accounts/**
 
+            - id: budget-service
+              uri: lb://account-service
+              predicates:
+                - Path=/api/budgets/**
+
             - id: transaction-service
               uri: lb://transaction-service
               predicates:
                 - Path=/api/transactions/**
-
-            - id: budgetwise
-              uri: lb://budgetwise
-              predicates:
-                - Path=/api/budgets/**,/api/exchange/**
 
 eureka:
   client:
