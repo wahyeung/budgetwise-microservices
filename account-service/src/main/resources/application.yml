@@ -16,6 +16,10 @@ spring:
   cloud:
     compatibility-verifier:
       enabled: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10m
 
 eureka:
   client:

@@ -5,6 +5,8 @@ import com.budgetwise.accountservice.entity.Account;
 import com.budgetwise.accountservice.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +21,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserClient userClient;
 
+    @CacheEvict(value = "acccountSummary", key = "#userId")
     public Account createAccount(Long userId, String accountName,
                                  Account.AccountType type, BigDecimal initialBalance) {
         //Call user-service via OpenFeign to validate user existence
@@ -38,6 +41,7 @@ public class AccountService {
     }
 
     //CompletableFuture + Stream
+    @Cacheable(value = "accountSummary", key = "#userId")
     public Map<String, Object> getAccountSummary(Long userId) {
         List<Account> accounts = accountRepository.findByUserId(userId);
         UserClient.UserDTO user = userClient.getUserById(userId);
