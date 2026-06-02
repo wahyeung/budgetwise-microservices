@@ -20,6 +20,15 @@ spring:
     type: caffeine
     caffeine:
       spec: maximumSize=500,expireAfterWrite=10m
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: account-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+
 
 eureka:
   client:

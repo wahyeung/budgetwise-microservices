@@ -3,9 +3,12 @@ package com.budgetwise.transactionservice.service;
 import com.budgetwise.transactionservice.client.AccountClient;
 import com.budgetwise.transactionservice.client.AccountDTO;
 import com.budgetwise.transactionservice.entity.Transaction;
+import com.budgetwise.transactionservice.event.TransactionCreatedEvent;
+import com.budgetwise.transactionservice.kafka.TransactionProducer;
 import com.budgetwise.transactionservice.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,8 @@ public class TransactionService {
     private final AccountClient accountClient;
 //    private final org.springframework.web.client.RestTemplate restTemplate =
 //            new org.springframework.web.client.RestTemplate();
+    @Autowired
+    private TransactionProducer transactionProducer;
 
     @Transactional
     public Transaction addTransaction(Long accountId, BigDecimal amount,
@@ -35,7 +40,19 @@ public class TransactionService {
         transaction.setType(type);
         transaction.setCategory(category);
         transaction.setDescription(description);
-        return transactionRepository.save(transaction);
+        Transaction saved =  transactionRepository.save(transaction);
+
+        //Publish Kafka Event
+        TransactionCreatedEvent event = new TransactionCreatedEvent(
+                saved.getId(),
+                saved.getAccountId(),
+                null,
+                saved.getAmount(),
+                saved.getType().name(),
+                saved.getCategory()
+        );
+        transactionProducer.sendTransactionCreatedEvent(event);
+        return saved;
     }
 
     //Stream — Expense Statistics by Category
